@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lol.banPick.dao.BPDao">
+	<select id="teamList" resultType="com.lol.banPick.dto.TeamListDto">
+		select * from TEAMLIST order by TEAMINITIAL asc
+	</select>
+	<insert id="teamRegister" parameterType="com.lol.banPick.dto.TeamListDto">
+		insert into TEAMLIST (TEAMNAME, TEAMINITIAL)
+		values (#{teamName}, #{teamInitial})
+	</insert>
+	<select id="playerInfo" parameterType="String" resultType="com.lol.banPick.dto.PlayerListDto">
+		select * from PLAYERLIST where TEAMINITIAL = #{teamInitial}
+	</select>
+	<insert id="playerRegister" parameterType="com.lol.banPick.dto.PlayerListDto">
+		insert into PLAYERLIST (NICKNAME, TEAMINITIAL, POSITION)
+		values (#{nickName}, #{teamInitial}, #{position})
+	</insert>
+	<select id="checkPlayer" resultType="String">
+		select NICKNAME from PLAYERLIST
+	</select>
+	<select id="checkModify" parameterType="String" resultType="com.lol.banPick.dto.PlayerListDto">
+		select * from PLAYERLIST where NICKNAME = #{nickName}
+	</select>
+	<delete id="deletePlayer" parameterType="String">
+		delete from PLAYERLIST where TEAMINITIAL = #{selectTeamInitial}
+	</delete>
+	<select id="checkPlayer2" parameterType="String" resultType="String">
+		select NICKNAME from PLAYERLIST where NOT TEAMINITIAL = #{teamInitial}
+	</select>
+	<select id="searchTeamInitial" parameterType="String" resultType="com.lol.banPick.dto.TeamListDto">
+		select * from TEAMLIST where TEAMINITIAL like '%' || #{search} || '%'  order by TEAMINITIAL asc
+	</select>
+	<select id="searchTeamName" parameterType="String" resultType="com.lol.banPick.dto.TeamListDto">
+		select * from TEAMLIST where TEAMNAME like '%' || #{search} || '%'  order by TEAMINITIAL asc
+	</select>
+	<delete id="playerDelete" parameterType="String">
+		delete from PLAYERLIST where NICKNAME = #{nickName}
+	</delete>
+	<select id="selectMatchNo" resultType="int">
+		select max(MATCHNO) from MATCHREADY
+	</select>
+	<delete id="deleteMatch" parameterType="int">
+		delete from MATCHREADY where MATCHNO = #{matchNo}
+	</delete>
+	<insert id="registerMatch" parameterType="com.lol.banPick.dto.MatchReatyDto">
+		insert into MATCHREADY (MATCHNO, CAMP, POSITION, NICKNAME, CHAMPION, MATCHRESULT, PATCHVERSION, TEAMINITIAL)
+		values (#{matchNo}, #{camp}, #{position}, #{nickName}, #{champion}, #{matchResult}, #{patchVersion}, #{teamInitial})
+	</insert>
+	<insert id="registerBanPick" parameterType="com.lol.banPick.dto.BanPickPhaseDto">
+		insert into BANPICKPHASE
+		(
+			MATCHNO, BLUEBAN1, REDBAN1, BLUEBAN2, REDBAN2, BLUEBAN3, REDBAN3,
+			BLUEPICK1, REDPICK1, REDPICK2, BLUEPICK2, BLUEPICK3, REDPICK3,
+			REDBAN4, BLUEBAN4, REDBAN5, BLUEBAN5,
+			REDPICK4, BLUEPICK4, BLUEPICK5, REDPICK5, PATCHVERSION
+		)
+		values
+		(
+			#{matchNo}, #{blueBan1}, #{redBan1}, #{blueBan2}, #{redBan2}, #{blueBan3}, #{redBan3},
+			#{bluePick1}, #{redPick1}, #{redPick2}, #{bluePick2}, #{bluePick3}, #{redPick3},
+			#{redBan4}, #{blueBan4}, #{redBan5}, #{blueBan5},
+			#{redPick4}, #{bluePick4}, #{bluePick5}, #{redPick5}, #{patchVersion}
+		)
+	</insert>
+	<select id="getBanPickRecord" resultType="com.lol.banPick.dto.BanPickPhaseDto">
+		select * from BANPICKPHASE order by MATCHNO desc
+	</select>
+	<select id="getMatchRecord" resultType="com.lol.banPick.dto.MatchReatyDto">
+		select * from MATCHREADY order by MATCHNO desc, camp asc
+	</select>
+	<select id="getPatchVersion" resultType="String">
+		select distinct PATCHVERSION from BANPICKPHASE
+	</select>
+</mapper>
